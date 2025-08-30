@@ -1,6 +1,12 @@
 server:
   port: 8761
 
+spring:
+  security:
+    user:
+      name: lakshay
+      password: changemeinprod!
+
 eureka:
   client:
     register-with-eureka: false
