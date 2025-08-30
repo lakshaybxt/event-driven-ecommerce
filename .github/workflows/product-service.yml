@@ -36,9 +36,11 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B clean install --file pom.xml
+        working-directory: ./ecommerce-microservices/product-service
+        run: mvn -B clean install
 
       - name: Build Docker Image
+        working-directory: ./ecommerce-microservices/product-service
         run: docker build -t ghcr.io/OWNER/product-service:latest .
 
       - name: Update dependency graph
