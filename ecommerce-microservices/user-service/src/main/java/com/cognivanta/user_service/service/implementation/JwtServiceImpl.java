@@ -15,6 +15,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -46,16 +47,38 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-        return "";
+        return extractClaims(token, Claims::getSubject);
+    }
+
+    private <T>T extractClaims(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigninKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     @Override
     public boolean validateToken(String token, UserDetails userDetails) {
-        return false;
+        String username = extractUsername(token);
+        return (userDetails.getUsername().equals(username) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaims(token, Claims::getExpiration);
     }
 
     @Override
     public long getExpirationTime() {
-        return 0;
+        return jwtExpiration;
     }
 }

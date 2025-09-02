@@ -1,6 +1,6 @@
 package com.cognivanta.user_service.security;
 
-import com.cognivanta.user_service.domain.entity.Role;
+import com.cognivanta.user_service.domain.Role;
 import com.cognivanta.user_service.domain.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

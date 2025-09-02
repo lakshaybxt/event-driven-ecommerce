@@ -1,5 +1,6 @@
 package com.cognivanta.user_service.domain.entity;
 
+import com.cognivanta.user_service.domain.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,9 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
+    private String number;
 
     @Column(nullable = false)
     private String password;
