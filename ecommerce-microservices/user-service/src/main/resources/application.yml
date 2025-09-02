@@ -23,3 +23,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://lakshaycd:lakshay@localhost:8761/eureka/
+
+security:
+  jwt:
+    secret-key: bde05efd186b5f1504be2a8213cebf54
+    expiration-time: 3600000
