@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +37,11 @@ public class User {
 
     @Column(name = "verification_expiration")
     private LocalDateTime verificationCodeExpiration;
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 
     @Builder.Default
     private boolean enabled = false;
