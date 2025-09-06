@@ -6,7 +6,7 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/userdb
+    url: jdbc:postgresql://localhost:5433/userdb
     username: userdb
     password: changemeinprod!
 
@@ -19,12 +19,29 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SUPPORT_EMAIL}
+    password: ${APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+          enable: true
+
+  config:
+    import: optional:classpath:env.properties
+
 eureka:
   client:
     service-url:
-      defaultZone: http://lakshaycd:lakshay@localhost:8761/eureka/
+      defaultZone: http://lakshay:lakshay@localhost:8761/eureka/
 
 security:
   jwt:
     secret-key: bde05efd186b5f1504be2a8213cebf54
     expiration-time: 3600000
+
+
