@@ -24,8 +24,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/products/public/**").permitAll()
-                        .requestMatchers("/api/v1/products/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/product/public/**").permitAll()
+                        .requestMatchers("/api/v1/brand/public/**").permitAll()
+                        .requestMatchers("/api/v1/category/public/**").permitAll()
+                        .requestMatchers("/api/v1/product/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/brand/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/category/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/brand/**").authenticated()
+                        .requestMatchers("/api/v1/category/**").authenticated()
                         .requestMatchers("/api/v1/products/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
