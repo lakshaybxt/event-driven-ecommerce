@@ -36,22 +36,30 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
             String username = jwtService.extractUsername(token);
 
-            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if(jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-
-                    if(userDetails instanceof EcomUserDetails) {
-                        request.setAttribute("userId", ((EcomUserDetails) userDetails).getId());
-                    }
-                }
+            if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+                filterChain.doFilter(request, response);
+                return;
             }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if(!jwtService.validateToken(token, userDetails)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+            );
+
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            if(userDetails instanceof EcomUserDetails) {
+                request.setAttribute("userId", ((EcomUserDetails) userDetails).getId());
+            }
+
+
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
             return;
@@ -63,9 +71,8 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
     private String extractToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
 
-        if(header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
+        return (header != null && header.startsWith("Bearer "))
+                ? header.substring(7)
+                : null;
     }
 }
