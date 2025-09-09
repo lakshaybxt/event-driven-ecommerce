@@ -41,7 +41,7 @@ eureka:
 
 security:
   jwt:
-    secret-key: bde05efd186b5f1504be2a8213cebf54
+    secret-key: 6Rk8dVjG0tM1FZT7nLqXztdVd7y9hTqY3FjXZ3qH1Nc=
     expiration-time: 3600000
 
 
