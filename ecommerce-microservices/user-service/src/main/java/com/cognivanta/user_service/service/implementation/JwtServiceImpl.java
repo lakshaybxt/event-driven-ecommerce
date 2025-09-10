@@ -1,5 +1,6 @@
 package com.cognivanta.user_service.service.implementation;
 
+import com.cognivanta.user_service.security.EcomUserDetails;
 import com.cognivanta.user_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +15,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Service
@@ -28,6 +30,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", ((EcomUserDetails) userDetails).getId());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(Objects::toString)
+                .toList());
+
         return Jwts.builder()
                 .claims()
                 .add(claims)

@@ -24,4 +24,9 @@ eureka:
     service-url:
       defaultZone: http://lakshay:lakshay@localhost:8761/eureka/
 
+security:
+  jwt:
+    secret-key: 6Rk8dVjG0tM1FZT7nLqXztdVd7y9hTqY3FjXZ3qH1Nc=
+    expiration-time: 3600000
+
 

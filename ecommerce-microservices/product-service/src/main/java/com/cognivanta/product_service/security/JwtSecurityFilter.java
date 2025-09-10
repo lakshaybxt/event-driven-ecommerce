@@ -1,9 +1,11 @@
 package com.cognivanta.product_service.security;
 
+import com.cognivanta.product_service.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,40 +13,42 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-public class HeaderBasedAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class JwtSecurityFilter extends OncePerRequestFilter {
 
+    private final JwtService jwtService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String userId = request.getHeader("X-User-Id");
-        String userRoles = request.getHeader("X-User-Roles");
-        String username = request.getHeader("X-Username");
+        String token = extractToken(request);
 
-        if(userId != null && username != null) {
-            List<SimpleGrantedAuthority> authorities = parseRoles(userRoles);
+        if(token != null && jwtService.validateToken(token)) {
+
+            String userId = jwtService.extractUserId(token);
+            List<String> roles = jwtService.extractRoles(token);
+
+            List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .toList();
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    username, null, authorities
+                    userId, null, authorities
             );
 
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
-            request.setAttribute("userId", UUID.fromString(userId));
+
+            request.setAttribute("userId", userId);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private List<SimpleGrantedAuthority> parseRoles(String userRoles) {
-        if(userRoles == null || userRoles.isEmpty()) {
-            return null;
-        }
-
-        return Arrays.stream(userRoles.split(","))
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.trim()))
-                .toList();
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return (authHeader != null && authHeader.startsWith("Bearer "))
+                ? authHeader.substring(7)
+                : null;
     }
 }

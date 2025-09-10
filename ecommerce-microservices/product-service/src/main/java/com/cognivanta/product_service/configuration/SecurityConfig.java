@@ -1,6 +1,8 @@
 package com.cognivanta.product_service.configuration;
 
 import com.cognivanta.product_service.security.HeaderBasedAuthenticationFilter;
+import com.cognivanta.product_service.security.JwtSecurityFilter;
+import com.cognivanta.product_service.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,7 +21,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtSecurityFilter jwtSecurityFilter) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -36,13 +38,18 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(headerBasedAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public HeaderBasedAuthenticationFilter headerBasedAuthenticationFilter() {
         return new HeaderBasedAuthenticationFilter();
+    }
+
+    @Bean
+    public JwtSecurityFilter jwtSecurityFilter(JwtService jwtService) {
+        return new JwtSecurityFilter(jwtService);
     }
 
     @Bean
