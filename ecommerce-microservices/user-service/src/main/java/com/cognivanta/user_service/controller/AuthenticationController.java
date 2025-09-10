@@ -1,5 +1,6 @@
 package com.cognivanta.user_service.controller;
 
+import com.cognivanta.user_service.domain.Role;
 import com.cognivanta.user_service.domain.dto.*;
 import com.cognivanta.user_service.domain.entity.User;
 import com.cognivanta.user_service.mapper.UserMapper;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -47,7 +50,6 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     @PostMapping(path = "/resend")
     public ResponseEntity<?> verifyUser(@RequestParam String email) {

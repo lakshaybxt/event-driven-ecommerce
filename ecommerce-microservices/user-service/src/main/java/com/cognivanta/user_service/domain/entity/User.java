@@ -47,6 +47,8 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    private int tokenVersion = 0;
+
     @Builder.Default
     private boolean enabled = false;
 
