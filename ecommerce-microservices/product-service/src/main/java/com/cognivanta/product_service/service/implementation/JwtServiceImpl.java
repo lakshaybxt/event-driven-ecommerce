@@ -20,6 +20,8 @@ public class JwtServiceImpl implements JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
+
+
     private SecretKey getSigninkey() {
         byte[] keybytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keybytes);

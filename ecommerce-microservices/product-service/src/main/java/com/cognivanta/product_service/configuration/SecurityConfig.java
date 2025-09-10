@@ -26,9 +26,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/product/public/**").permitAll()
-                        .requestMatchers("/api/v1/brand/public/**").permitAll()
-                        .requestMatchers("/api/v1/category/public/**").permitAll()
+                        .requestMatchers("/api/v1/product/public/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers("/api/v1/brand/public/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers("/api/v1/category/public/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .requestMatchers("/api/v1/product/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/brand/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/category/admin/**").hasRole("ADMIN")
