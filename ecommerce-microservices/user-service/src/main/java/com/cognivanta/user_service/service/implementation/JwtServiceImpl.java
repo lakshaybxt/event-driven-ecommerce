@@ -36,12 +36,10 @@ public class JwtServiceImpl implements JwtService {
                 .toList());
 
         return Jwts.builder()
-                .claims()
-                .add(claims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .and()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
