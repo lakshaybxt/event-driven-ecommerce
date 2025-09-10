@@ -1,5 +1,6 @@
 package com.cognivanta.user_service.service.implementation;
 
+import com.cognivanta.user_service.domain.Role;
 import com.cognivanta.user_service.domain.dto.LoginUserDto;
 import com.cognivanta.user_service.domain.dto.RegisterUserDto;
 import com.cognivanta.user_service.domain.dto.VerifyUserDto;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(request.getEmail())
                 .number(request.getNumber())
                 .password(encoder.encode(request.getPassword()))
+                .roles(Set.of(Role.CUSTOMER))
                 .verificationCode(generateVerificationCode())
                 .verificationCodeExpiration(LocalDateTime.now().plusMinutes(15))
                 .build();
