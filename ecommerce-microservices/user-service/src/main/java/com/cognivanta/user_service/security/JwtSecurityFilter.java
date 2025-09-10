@@ -1,5 +1,7 @@
 package com.cognivanta.user_service.security;
 
+import com.cognivanta.user_service.domain.entity.User;
+import com.cognivanta.user_service.service.AuthenticationService;
 import com.cognivanta.user_service.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class JwtSecurityFilter extends OncePerRequestFilter {
@@ -22,6 +25,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final AuthenticationService authService;
 
 
     @Override
@@ -48,17 +52,25 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
                 return;
             }
 
+            if(userDetails instanceof EcomUserDetails ecomUserDetails) {
+                UUID userId = ecomUserDetails.getId();
+                int tokenVersion = jwtService.extractTokenVersion(token);
+                User dbUser = authService.getUserById(userId);
+
+                if(tokenVersion != dbUser.getTokenVersion()) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+
+                request.setAttribute("userId", userId);
+            }
+
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
             );
 
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
-
-            if(userDetails instanceof EcomUserDetails) {
-                request.setAttribute("userId", ((EcomUserDetails) userDetails).getId());
-            }
-
 
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(request, response, null, e);

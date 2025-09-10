@@ -34,6 +34,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(Objects::toString)
                 .toList());
+        claims.put("tokenVersion", ((EcomUserDetails) userDetails).getUser().getTokenVersion());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -84,5 +85,10 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public long getExpirationTime() {
         return jwtExpiration;
+    }
+
+    @Override
+    public int extractTokenVersion(String token) {
+        return extractClaims(token, claims -> claims.get("tokenVersion", Integer.class));
     }
 }

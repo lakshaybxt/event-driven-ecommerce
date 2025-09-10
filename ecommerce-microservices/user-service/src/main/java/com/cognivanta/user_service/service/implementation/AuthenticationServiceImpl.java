@@ -1,14 +1,17 @@
 package com.cognivanta.user_service.service.implementation;
 
 import com.cognivanta.user_service.domain.Role;
+import com.cognivanta.user_service.domain.dto.LoginResponse;
 import com.cognivanta.user_service.domain.dto.LoginUserDto;
 import com.cognivanta.user_service.domain.dto.RegisterUserDto;
 import com.cognivanta.user_service.domain.dto.VerifyUserDto;
 import com.cognivanta.user_service.domain.entity.User;
 import com.cognivanta.user_service.exception.UserAlreadyExistException;
 import com.cognivanta.user_service.repository.UserRepository;
+import com.cognivanta.user_service.security.EcomUserDetails;
 import com.cognivanta.user_service.service.AuthenticationService;
 import com.cognivanta.user_service.service.EmailService;
+import com.cognivanta.user_service.service.JwtService;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +37,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepo;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
 
     @Override
     public User signup(RegisterUserDto request) {
@@ -66,7 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public UserDetails authenticate(LoginUserDto request) {
-        User existingUser = userRepository.findByEmail(request.getEmail())
+        User existingUser = userRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with the follwing email: "));
 
         if(!existingUser.isEnabled()) {
@@ -88,7 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void verifyUser(VerifyUserDto request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        Optional<User> optionalUser = userRepo.findByEmail(request.getEmail());
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -100,7 +104,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 user.setEnabled(true);
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiration(null);
-                userRepository.save(user);
+                userRepo.save(user);
             } else {
                 throw new RuntimeException("Invalid verification code");
             }
@@ -111,7 +115,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void resenVerificationEmail(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        Optional<User> optionalUser = userRepo.findByEmail(email);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -121,11 +125,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiration(LocalDateTime.now().plusMinutes(15));
-            userRepository.save(user);
+            userRepo.save(user);
             sendVerificationEmail(user);
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @Override
+    public LoginResponse changeRoleToAdmin(UUID userId) {
+        User existingUser = getUserById(userId);
+
+        Set<Role> existingRoles = existingUser.getRoles();
+        existingRoles.add(Role.ADMIN);
+        existingUser.setTokenVersion(existingUser.getTokenVersion() + 1);
+
+        User savedUser = userRepo.save(existingUser);
+
+        UserDetails userDetails = new EcomUserDetails(savedUser);
+
+         String token = jwtService.generateToken(userDetails);
+
+         return LoginResponse.builder()
+                 .token(token)
+                 .expiration(jwtService.getExpirationTime())
+                 .build();
+    }
+
+    @Override
+    public User getUserById(UUID userId) {
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with user Id: " + userId));
     }
 
     public void sendVerificationEmail(User user) {
