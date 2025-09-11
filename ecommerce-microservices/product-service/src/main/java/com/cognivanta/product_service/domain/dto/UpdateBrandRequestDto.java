@@ -9,12 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateUpdateBrandRequestDto {
-
-    @NotBlank(message = "Brand name is required")
+public class UpdateBrandRequestDto {
     private String name;
 
-    @NotBlank(message = "Brand description required")
     @Size(min = 5, max = 20, message = "Description must be between {max} and {min} characters")
     private String description;
 }

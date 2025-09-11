@@ -1,6 +1,7 @@
 package com.cognivanta.product_service.service.implementation;
 
-import com.cognivanta.product_service.domain.dto.CreateUpdateBrandRequestDto;
+import com.cognivanta.product_service.domain.dto.CreateBrandRequestDto;
+import com.cognivanta.product_service.domain.dto.UpdateBrandRequestDto;
 import com.cognivanta.product_service.domain.entity.Brand;
 import com.cognivanta.product_service.exception.EntityAlreadyExistException;
 import com.cognivanta.product_service.repository.BrandRepository;
@@ -32,7 +33,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public Brand publishBrand(CreateUpdateBrandRequestDto request) {
+    public Brand publishBrand(CreateBrandRequestDto request) {
         if(brandRepo.existsByNameIgnoreCase(request.getName().toLowerCase()))
             throw new EntityAlreadyExistException("Brand with " + request.getName() + " alreay exist");
 
@@ -46,7 +47,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     @Transactional
-    public Brand updateBrand(UUID brandId, CreateUpdateBrandRequestDto request) {
+    public Brand updateBrand(UUID brandId, UpdateBrandRequestDto request) {
         Brand existingBrand = getBrandById(brandId);
 
         if (request.getName() != null && !request.getName().isBlank()) {

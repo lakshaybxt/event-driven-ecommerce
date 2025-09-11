@@ -1,7 +1,8 @@
 package com.cognivanta.product_service.controller;
 
 import com.cognivanta.product_service.domain.dto.BrandResponseDto;
-import com.cognivanta.product_service.domain.dto.CreateUpdateBrandRequestDto;
+import com.cognivanta.product_service.domain.dto.CreateBrandRequestDto;
+import com.cognivanta.product_service.domain.dto.UpdateBrandRequestDto;
 import com.cognivanta.product_service.domain.entity.Brand;
 import com.cognivanta.product_service.mapper.BrandMapper;
 import com.cognivanta.product_service.service.BrandService;
@@ -23,7 +24,7 @@ public class BrandController {
     private final BrandMapper brandMapper;
 
     @PostMapping(path = "/admin")
-    public ResponseEntity<BrandResponseDto> createBrand(@Valid @RequestBody CreateUpdateBrandRequestDto request) {
+    public ResponseEntity<BrandResponseDto> createBrand(@Valid @RequestBody CreateBrandRequestDto request) {
         Brand createdBrand  = brandService.publishBrand(request);
         BrandResponseDto response = brandMapper.toResponse(createdBrand);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -32,7 +33,7 @@ public class BrandController {
     @PutMapping(path = "/admin/{brandId}")
     public ResponseEntity<BrandResponseDto> updateBrand(
             @PathVariable UUID brandId,
-            @Valid @RequestBody CreateUpdateBrandRequestDto request
+            @Valid @RequestBody UpdateBrandRequestDto request
     ) {
         Brand brand = brandService.updateBrand(brandId, request);
         BrandResponseDto response = brandMapper.toResponse(brand);

@@ -1,6 +1,7 @@
 package com.cognivanta.product_service.service.implementation;
 
-import com.cognivanta.product_service.domain.dto.CreateUpdateCategoryRequestDto;
+import com.cognivanta.product_service.domain.dto.CreateCategoryRequestDto;
+import com.cognivanta.product_service.domain.dto.UpdateCategoryRequestDto;
 import com.cognivanta.product_service.domain.entity.Category;
 import com.cognivanta.product_service.exception.EntityAlreadyExistException;
 import com.cognivanta.product_service.repository.CategoryRepository;
@@ -32,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public Category publishCategory(CreateUpdateCategoryRequestDto request) {
+    public Category publishCategory(CreateCategoryRequestDto request) {
         if(categoryRepo.existsByNameIgnoreCase(request.getName().toLowerCase()))
             throw new EntityAlreadyExistException("Category with " + request.getName() + " already exist");
 
@@ -46,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public Category updateCategory(UUID categoryId, CreateUpdateCategoryRequestDto request) {
+    public Category updateCategory(UUID categoryId, UpdateCategoryRequestDto request) {
         Category existingcategory = getCategoryById(categoryId);
 
         if (request.getName() != null && !request.getName().isBlank()) {

@@ -1,7 +1,8 @@
 package com.cognivanta.product_service.controller;
 
 import com.cognivanta.product_service.domain.dto.CategoryResponseDto;
-import com.cognivanta.product_service.domain.dto.CreateUpdateCategoryRequestDto;
+import com.cognivanta.product_service.domain.dto.CreateCategoryRequestDto;
+import com.cognivanta.product_service.domain.dto.UpdateCategoryRequestDto;
 import com.cognivanta.product_service.domain.entity.Category;
 import com.cognivanta.product_service.mapper.CategoryMapper;
 import com.cognivanta.product_service.service.CategoryService;
@@ -23,7 +24,7 @@ public class CategoryController {
     private final CategoryMapper categoryMapper;
 
     @PostMapping(path = "/admin")
-    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CreateUpdateCategoryRequestDto request) {
+    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CreateCategoryRequestDto request) {
         Category createdCategory  = categoryService.publishCategory(request);
         CategoryResponseDto response = categoryMapper.toResponse(createdCategory);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -32,7 +33,7 @@ public class CategoryController {
     @PutMapping(path = "/admin/{categoryId}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable UUID categoryId,
-            @Valid @RequestBody CreateUpdateCategoryRequestDto request
+            @Valid @RequestBody UpdateCategoryRequestDto request
     ) {
         Category category = categoryService.updateCategory(categoryId, request);
         CategoryResponseDto response = categoryMapper.toResponse(category);

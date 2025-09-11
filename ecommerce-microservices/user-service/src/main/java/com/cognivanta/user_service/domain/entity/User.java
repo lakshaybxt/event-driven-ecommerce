@@ -47,6 +47,7 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "token_version", nullable = false, columnDefinition = "integer default 0")
     private int tokenVersion = 0;
 
     @Builder.Default

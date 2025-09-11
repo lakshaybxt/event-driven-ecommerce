@@ -1,6 +1,7 @@
 package com.cognivanta.user_service.configuration;
 
 import com.cognivanta.user_service.security.JwtSecurityFilter;
+import com.cognivanta.user_service.service.AuthenticationService;
 import com.cognivanta.user_service.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,9 +46,10 @@ public class SecurityConfiguration {
     public JwtSecurityFilter jwtSecurityFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
-            HandlerExceptionResolver handlerExceptionResolver
+            HandlerExceptionResolver handlerExceptionResolver,
+            AuthenticationService authService
     ) {
-        return new JwtSecurityFilter(jwtService, userDetailsService, handlerExceptionResolver);
+        return new JwtSecurityFilter(jwtService, userDetailsService, handlerExceptionResolver, authService);
     }
 
     @Bean
