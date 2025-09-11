@@ -1,5 +1,6 @@
 package com.microservice.product_service.service.implementation;
 
+import com.microservice.product_service.domain.dto.ProductSearchCriteria;
 import com.microservice.product_service.domain.dto.request.CreateProductRequest;
 import com.microservice.product_service.domain.entity.Brand;
 import com.microservice.product_service.domain.entity.Category;
@@ -9,8 +10,11 @@ import com.microservice.product_service.repository.ProductRepository;
 import com.microservice.product_service.service.BrandService;
 import com.microservice.product_service.service.CategoryService;
 import com.microservice.product_service.service.ProductService;
+import com.microservice.product_service.specification.ProductSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,5 +59,10 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
         return productRepo.save(product);
+    }
+
+    @Override
+    public Page<Product> searchProducts(ProductSearchCriteria criteria, Pageable pageable) {
+        return productRepo.findAll(ProductSpecification.withCriteria(criteria), pageable);
     }
 }
