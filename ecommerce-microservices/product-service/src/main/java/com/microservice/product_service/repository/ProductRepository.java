@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -16,5 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     boolean existsByNameIgnoreCase(String name);
     boolean existsByNameAndBrandAndCategory(String name, Brand brand, Category category);
     Page<Product> findAll(Specification<Product> productSpecification, Pageable pageable);
-
+    List<Product> findByCategoryAndIdNotAndTagsIn(Category category, UUID productId, List<String> tags, Pageable pageable);
+    List<Product> findByBrandAndIdNot(Brand brand, UUID id, Pageable pageable);
+    Page<Product> findAllByFeatured(boolean b, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.microservice.product_service.controller;
 
 import com.microservice.product_service.domain.dto.ErrorDto;
 import com.microservice.product_service.exception.BaseException;
+import com.microservice.product_service.exception.BusinessRuleException;
 import com.microservice.product_service.exception.EntityAlreadyExistException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -83,5 +84,17 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorDto> handleBusinessRuleException(BusinessRuleException ex) {
+        log.error("BusinessRuleException: {}", ex.getMessage());
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.NOT_MODIFIED.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_MODIFIED);
     }
 }

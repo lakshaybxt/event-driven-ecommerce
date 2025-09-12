@@ -2,6 +2,7 @@ package com.microservice.product_service.controller;
 
 import com.microservice.product_service.domain.dto.ProductSearchCriteria;
 import com.microservice.product_service.domain.dto.request.CreateProductRequest;
+import com.microservice.product_service.domain.dto.request.UpdateProductRequest;
 import com.microservice.product_service.domain.dto.response.ProductResponseDto;
 import com.microservice.product_service.domain.entity.Product;
 import com.microservice.product_service.mapper.ProductMapper;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,6 +67,113 @@ public class ProductController {
         Page<Product> products = prodService.searchProducts(criteria, pageable);
         Page<ProductResponseDto> response = products.map(prodMapper::toResponse);
 
+        return ResponseEntity.ok(response);
+    }
+//
+    @PutMapping(path = "/admin/{productId}")
+    public ResponseEntity<ProductResponseDto> updateProduct(
+            @PathVariable UUID productId,
+            @RequestBody UpdateProductRequest request
+    ) {
+        Product product = prodService.updateProduct(productId, request);
+        ProductResponseDto response = prodMapper.toResponse(product);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(path = "/admin/{productId}/featured")
+    public ResponseEntity<ProductResponseDto> toggleFeatured(@PathVariable UUID productId) {
+        Product product = prodService.toggleFeatured(productId);
+        ProductResponseDto response = prodMapper.toResponse(product);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(path = "/admin/{productId}/active")
+    public ResponseEntity<ProductResponseDto> toggleActive(@PathVariable UUID productId) {
+        Product product = prodService.toggleActive(productId);
+        ProductResponseDto response = prodMapper.toResponse(product);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/public/{productId}/personalized")
+    public ResponseEntity<List<ProductResponseDto>> getRecommendation(
+            @PathVariable UUID productId,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        List<Product> recommendation = prodService.getRecommendedProducts(productId, limit);
+        List<ProductResponseDto> responses = recommendation.stream()
+                .map(prodMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping(path = "/public/{productId}/recommendation")
+    public ResponseEntity<List<ProductResponseDto>> getRecommendationByBrand(
+            @PathVariable UUID productId,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        List<Product> recommendation = prodService.getRecommendedByBrands(productId, limit);
+        List<ProductResponseDto> responses = recommendation.stream()
+                .map(prodMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping(path = "/public/{productId}")
+    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable UUID productId) {
+        Product product = prodService.getProductById(productId);
+        ProductResponseDto response = prodMapper.toResponse(product);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/public")
+    public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> products = prodService.getAllProducts(pageable);
+        Page<ProductResponseDto> response = products.map(prodMapper::toResponse);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @GetMapping(path = "/public/featured")
+    public ResponseEntity<Page<ProductResponseDto>> getAllFeatured(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> products = prodService.getFeaturedProducts(pageable);
+        Page<ProductResponseDto> response = products.map(prodMapper::toResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(path = "/admin/{productId}")
+    public ResponseEntity<Void> softDeleteProduct(@PathVariable UUID productId) {
+        prodService.softDeleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(path = "/admin/{productId}/permanent")
+    public ResponseEntity<Void> permanentDeleteProduct(@PathVariable UUID productId) {
+        prodService.permanentDeleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(path = "admin/{productId}/restore")
+    public ResponseEntity<ProductResponseDto> restoreProduct(@PathVariable UUID productId) {
+        Product restoredProduct = prodService.restoreProduct(productId);
+        ProductResponseDto response =prodMapper.toResponse(restoredProduct);
         return ResponseEntity.ok(response);
     }
 }
