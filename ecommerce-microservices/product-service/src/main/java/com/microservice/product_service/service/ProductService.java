@@ -24,4 +24,5 @@ public interface ProductService {
     void softDeleteProduct(UUID productId);
     void permanentDeleteProduct(UUID productId);
     Product restoreProduct(UUID productId);
+    List<Product> getAllProductsByIds(List<UUID> productIds);
 }
