@@ -1,13 +1,13 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
   application:
-    name: product-service
+    name: cart-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/productdb
-    username: productdb
+    url: jdbc:postgresql://localhost:5434/cartdb
+    username: cartdb
     password: changemeinprod!
 
   jpa:

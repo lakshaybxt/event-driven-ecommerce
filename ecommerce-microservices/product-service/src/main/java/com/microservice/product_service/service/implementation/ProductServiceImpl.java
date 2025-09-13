@@ -230,6 +230,11 @@ public class ProductServiceImpl implements ProductService {
         return productRepo.save(product);
     }
 
+    @Override
+    public List<Product> getAllProductsByIds(List<UUID> productIds) {
+        return productRepo.findAllById(productIds);
+    }
+
     private void handleProductDeletion(Product product) {
 //        cartItemRepository.deleteProductById(product.getId());
 //        wishlistItemRepository.deleteProductById(product.getId());

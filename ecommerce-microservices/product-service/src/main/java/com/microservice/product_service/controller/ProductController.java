@@ -37,6 +37,25 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @DeleteMapping(path = "/admin/{productId}")
+    public ResponseEntity<Void> softDeleteProduct(@PathVariable UUID productId) {
+        prodService.softDeleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(path = "/admin/{productId}/permanent")
+    public ResponseEntity<Void> permanentDeleteProduct(@PathVariable UUID productId) {
+        prodService.permanentDeleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(path = "admin/{productId}/restore")
+    public ResponseEntity<ProductResponseDto> restoreProduct(@PathVariable UUID productId) {
+        Product restoredProduct = prodService.restoreProduct(productId);
+        ProductResponseDto response =prodMapper.toResponse(restoredProduct);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping(path = "/public/search")
     public ResponseEntity<Page<ProductResponseDto>> searchProducts(
             @RequestParam(required = false) String keyword,
@@ -158,22 +177,24 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(path = "/admin/{productId}")
-    public ResponseEntity<Void> softDeleteProduct(@PathVariable UUID productId) {
-        prodService.softDeleteProduct(productId);
-        return ResponseEntity.noContent().build();
+
+    @PostMapping("/public/bulk")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByIds(@RequestBody List<UUID> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return ResponseEntity.badRequest().body(List.of());
+        }
+
+        List<Product> products = prodService.getAllProductsByIds(productIds);
+
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<ProductResponseDto> responses = products.stream()
+                .map(prodMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
-    @DeleteMapping(path = "/admin/{productId}/permanent")
-    public ResponseEntity<Void> permanentDeleteProduct(@PathVariable UUID productId) {
-        prodService.permanentDeleteProduct(productId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping(path = "admin/{productId}/restore")
-    public ResponseEntity<ProductResponseDto> restoreProduct(@PathVariable UUID productId) {
-        Product restoredProduct = prodService.restoreProduct(productId);
-        ProductResponseDto response =prodMapper.toResponse(restoredProduct);
-        return ResponseEntity.ok(response);
-    }
 }

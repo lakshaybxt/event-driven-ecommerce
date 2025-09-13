@@ -1,6 +1,6 @@
-package com.microservice.product_service.service.implementation;
+package com.microservice.cart_service.service.implementation;
 
-import com.microservice.product_service.service.JwtService;
+import com.microservice.cart_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
