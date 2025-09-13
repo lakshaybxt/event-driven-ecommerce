@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: cartdb
+      POSTGRES_USER: cartdb
+      POSTGRES_PASSWORD: changemeinprod!
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8002:8080"
