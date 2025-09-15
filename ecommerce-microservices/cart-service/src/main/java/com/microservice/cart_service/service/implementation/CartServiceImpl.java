@@ -5,6 +5,7 @@ import com.microservice.cart_service.domain.entity.Cart;
 import com.microservice.cart_service.domain.entity.CartItem;
 import com.microservice.cart_service.repository.CartRepository;
 import com.microservice.cart_service.service.CartService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,33 @@ public class CartServiceImpl implements CartService {
                     .quantity(request.getQuantity())
                     .build();
             cart.getCartItems().add(cartItem);
+        }
+
+        return cartRepo.save(cart);
+    }
+
+    @Override
+    public Cart viewUserCart(UUID userId) {
+        return cartRepo.findByUserId(userId)
+                .orElseGet( () -> {
+                        Cart newCart = Cart.builder()
+                                .userId(userId)
+                                .cartItems(new ArrayList<>())
+                                .build();
+                            return cartRepo.save(newCart);
+                });
+    }
+
+    @Override
+    public Cart removeProductFromCart(UUID userId, UUID productId) {
+        Cart cart = cartRepo.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Cart not found with the id: " + userId));
+
+        boolean removed = cart.getCartItems().removeIf(item ->
+                item.getProductId().equals(productId));
+
+        if(!removed) {
+            throw new EntityNotFoundException("Product not found in cart");
         }
 
         return cartRepo.save(cart);

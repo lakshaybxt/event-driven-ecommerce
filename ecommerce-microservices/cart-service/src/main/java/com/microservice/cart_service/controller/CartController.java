@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 @RestController
@@ -20,7 +21,7 @@ public class CartController {
     private final CartService cartService;
     private final CartMapper cartMapper;
 
-    @PutMapping
+    @PutMapping(path = "/public/add")
     public ResponseEntity<CartResponseDto> addToCart(
             @RequestAttribute UUID userId,
             @Valid @RequestBody AddToCartRequest request
@@ -30,4 +31,22 @@ public class CartController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(path = "/public")
+    public ResponseEntity<CartResponseDto> viewCart(@RequestAttribute UUID userId) {
+        Cart cart = cartService.viewUserCart(userId);
+        CartResponseDto response = cartMapper.toResponse(cart);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(path = "/remove")
+    public ResponseEntity<CartResponseDto> removeFromCart(
+            @RequestAttribute UUID userId,
+            @RequestParam UUID productId
+    ) {
+        Cart cart = cartService.removeProductFromCart(userId, productId);
+        CartResponseDto response = cartMapper.toResponse(cart);
+        return ResponseEntity.ok(response);
+    }
+
 }
