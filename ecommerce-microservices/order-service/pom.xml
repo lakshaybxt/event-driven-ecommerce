@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.microservice</groupId>
-	<artifactId>cartr-service</artifactId>
+	<artifactId>order-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>order-service</name>
-	<description>Order Service for managing orders information</description>
+	<description>Order Service for managing orders</description>
 	<url/>
 	<licenses>
 		<license/>
