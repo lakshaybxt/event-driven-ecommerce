@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = "com.microservice.order_service.client")
+@EnableEurekaClient
 public class OrderServiceApplication {
 
 	public static void main(String[] args) {
