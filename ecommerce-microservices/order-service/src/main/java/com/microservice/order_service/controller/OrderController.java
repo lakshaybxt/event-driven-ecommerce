@@ -25,6 +25,7 @@ public class OrderController {
             @RequestBody @Valid CheckoutRequest request
     ) {
         Order order = orderService.checkout(userId, request);
-        OrderResponseDto items =
+        OrderResponseDto response = new OrderResponseDto(order);
+        return ResponseEntity.ok(response);
     }
 }
