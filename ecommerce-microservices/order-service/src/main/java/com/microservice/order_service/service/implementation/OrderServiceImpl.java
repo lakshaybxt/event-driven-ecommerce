@@ -5,12 +5,15 @@ import com.microservice.order_service.domain.OrderStatus;
 import com.microservice.order_service.domain.PaymentStatus;
 import com.microservice.order_service.domain.dto.CartResponse;
 import com.microservice.order_service.domain.dto.CheckoutRequest;
+import com.microservice.order_service.kafka.event.StockUpdateEvent;
 import com.microservice.order_service.domain.entity.Order;
 import com.microservice.order_service.domain.entity.OrderItem;
 import com.microservice.order_service.exception.EmptyCartException;
+import com.microservice.order_service.kafka.KafkaTopics;
 import com.microservice.order_service.repository.OrderRepository;
 import com.microservice.order_service.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepo;
     private final CartClient cartClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public Order checkout(UUID userId, CheckoutRequest request) {
@@ -34,13 +38,20 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // TODO: Kafka sends message to product to reduce the quantity
+//        userCart.getItems().forEach(cartItem -> {
+//            StockUpdateEvent event = StockUpdateEvent.builder()
+//                    .productId(cartItem.getProductId())
+//                    .quantity(cartItem.getQuantity())
+//                    .build();
+//            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
+//        });
 
         List<OrderItem> orderItems = userCart.getItems().stream()
                 .map(cartItem -> OrderItem.builder()
                         .productId(cartItem.getProductId())
+                        .orderStatus(OrderStatus.PENDING)
                         .priceAtPurchase(cartItem.getDiscountedPrice())
                         .quantity(cartItem.getQuantity())
-                        .orderStatus(OrderStatus.PLACED)
                         .purchasedAt(LocalDateTime.now())
                         .build())
                 .toList();
@@ -55,21 +66,28 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = Order.builder()
                 .userId(userId)
-                .orderStatus(OrderStatus.PLACED)
-                .paymentStatus(status)
+                .orderStatus(OrderStatus.PENDING)
+                .paymentStatus(PaymentStatus.PENDING)
                 .paymentMethod(request.getPaymentMethod())
                 .finalPrice(finalPrice)
                 .orderItems(orderItems)
-                .shippingAddress(addressSnap)
+                .shippingAddress(request.getAddressSnap())
                 .build();
 
         order.getOrderItems().forEach(orderItem -> orderItem.setOrder(order));
 
         Order savedOrder = orderRepo.save(order);
 
-        //TODO: Call Cart-Service through kafka to empty the cart
+        savedOrder.getOrderItems().forEach(orderItem -> {
+            StockUpdateEvent event = StockUpdateEvent.builder()
+                    .orderId(savedOrder.getId())
+                    .productId(orderItem.getProductId())
+                    .quantity(orderItem.getQuantity())
+                    .build();
+            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
+        });
 
-        //TODO: send confirmation mail
+        // TODO: Empty cart and send confirmation mail
 
         return savedOrder;
     }

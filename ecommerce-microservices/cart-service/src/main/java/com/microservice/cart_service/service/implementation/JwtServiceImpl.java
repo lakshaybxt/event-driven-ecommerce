@@ -24,6 +24,7 @@ public class JwtServiceImpl implements JwtService {
         byte[] keybytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keybytes);
     }
+
     @Override
     public boolean validateToken(String token) {
         return !extractExpiration(token).before(new Date());
