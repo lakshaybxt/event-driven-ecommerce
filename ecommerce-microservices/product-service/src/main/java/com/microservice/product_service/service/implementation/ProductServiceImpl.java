@@ -235,6 +235,12 @@ public class ProductServiceImpl implements ProductService {
         return productRepo.findAllById(productIds);
     }
 
+    @Override
+    public boolean reserveStock(UUID productId, int qty) {
+        int updated = productRepo.reserveStock(productId, qty);
+        return updated > 0;
+    }
+
     private void handleProductDeletion(Product product) {
 //        cartItemRepository.deleteProductById(product.getId());
 //        wishlistItemRepository.deleteProductById(product.getId());

@@ -178,7 +178,7 @@ public class ProductController {
     }
 
 
-    @PostMapping("/public/bulk")
+    @PostMapping(path = "/public/bulk")
     public ResponseEntity<List<ProductResponseDto>> getProductsByIds(@RequestBody List<UUID> productIds) {
         if (productIds == null || productIds.isEmpty()) {
             return ResponseEntity.badRequest().body(List.of());
@@ -197,4 +197,13 @@ public class ProductController {
         return ResponseEntity.ok(responses);
     }
 
+    @PostMapping(path = "/public/{productId}/reserve")
+    public ResponseEntity<String> reserveStock(@PathVariable UUID productId, @RequestParam int qty) {
+        boolean reserved = prodService.reserveStock(productId, qty);
+        if (reserved) {
+            return ResponseEntity.ok("Stock reserved successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Insufficient stock");
+        }
+    }
 }

@@ -25,4 +25,5 @@ public interface ProductService {
     void permanentDeleteProduct(UUID productId);
     Product restoreProduct(UUID productId);
     List<Product> getAllProductsByIds(List<UUID> productIds);
+    boolean reserveStock(UUID productId, int qty);
 }
