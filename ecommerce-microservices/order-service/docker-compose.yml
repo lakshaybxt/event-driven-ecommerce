@@ -5,8 +5,8 @@ services:
       - "${POSTGRES_PORT_ORDER:-5435}:5432"
     restart: ${POSTGRES_RESTART:-always}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB_ORDER}
-      POSTGRES_USER: ${POSTGRES_USER_ORDER}
+      POSTGRES_DB: ${POSTGRES_DB_ORDER:-orderdb}
+      POSTGRES_USER: ${POSTGRES_USER_ORDER:-orderdb}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_ORDER}
 
   adminer:

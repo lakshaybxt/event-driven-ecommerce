@@ -41,6 +41,8 @@ mvn clean install
 Each service has its own `docker-compose.yml` for its database.  
 To start a service’s database, run (for example):
 
+Replace the password in `.env`
+
 ```sh
 cd product-service
 docker compose up -d

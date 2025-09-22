@@ -5,8 +5,8 @@ services:
       - "${POSTGRES_PORT_CART:-5434}:5432"
     restart: ${POSTGRES_RESTART:-always}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB_CART}
-      POSTGRES_USER: ${POSTGRES_USER_CART}
+      POSTGRES_DB: ${POSTGRES_DB_CART:-cartdb}
+      POSTGRES_USER: ${POSTGRES_USER_CART:-cartdb}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_CART}
 
   adminer:
