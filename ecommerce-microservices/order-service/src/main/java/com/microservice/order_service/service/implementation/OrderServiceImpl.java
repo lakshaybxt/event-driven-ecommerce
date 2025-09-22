@@ -1,6 +1,7 @@
 package com.microservice.order_service.service.implementation;
 
 import com.microservice.order_service.client.CartClient;
+import com.microservice.order_service.client.ProductClient;
 import com.microservice.order_service.domain.OrderStatus;
 import com.microservice.order_service.domain.PaymentStatus;
 import com.microservice.order_service.domain.dto.CartResponse;
@@ -13,6 +14,7 @@ import com.microservice.order_service.kafka.KafkaTopics;
 import com.microservice.order_service.repository.OrderRepository;
 import com.microservice.order_service.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepo;
     private final CartClient cartClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProductClient prodClient;
 
     @Override
     public Order checkout(UUID userId, CheckoutRequest request) {
@@ -37,14 +40,13 @@ public class OrderServiceImpl implements OrderService {
             throw new EmptyCartException("Cart is empty. Add items before checkout");
         }
 
-        // TODO: Kafka sends message to product to reduce the quantity
-//        userCart.getItems().forEach(cartItem -> {
-//            StockUpdateEvent event = StockUpdateEvent.builder()
-//                    .productId(cartItem.getProductId())
-//                    .quantity(cartItem.getQuantity())
-//                    .build();
-//            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
-//        });
+        // Reserve product before saving it
+        for(var cartItem : userCart.getItems()) {
+            ResponseEntity<String> response = prodClient.reserveStock(cartItem.getProductId(), cartItem.getQuantity());
+            if(!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Stock not available for product " + cartItem.getProductId());
+            }
+        }
 
         List<OrderItem> orderItems = userCart.getItems().stream()
                 .map(cartItem -> OrderItem.builder()
@@ -78,14 +80,14 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepo.save(order);
 
-        savedOrder.getOrderItems().forEach(orderItem -> {
-            StockUpdateEvent event = StockUpdateEvent.builder()
-                    .orderId(savedOrder.getId())
-                    .productId(orderItem.getProductId())
-                    .quantity(orderItem.getQuantity())
-                    .build();
-            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
-        });
+//        savedOrder.getOrderItems().forEach(orderItem -> {
+//            StockUpdateEvent event = StockUpdateEvent.builder()
+//                    .orderId(savedOrder.getId())
+//                    .productId(orderItem.getProductId())
+//                    .quantity(orderItem.getQuantity())
+//                    .build();
+//            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
+//        });
 
         // TODO: Empty cart and send confirmation mail
 

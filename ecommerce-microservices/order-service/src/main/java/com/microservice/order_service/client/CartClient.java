@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "cart-service")
+@FeignClient(name = "cart-service", url = "http://localhost:8080/api/v1")
 public interface CartClient {
 
-    @GetMapping("/api/v1/cart/public")
+    @GetMapping("/cart/public")
     CartResponse viewCart(@RequestAttribute UUID userId);
 }
