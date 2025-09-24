@@ -13,16 +13,10 @@ import java.util.List;
 @Component
 public class OrderMapper {
 
-    private final CartClient cartClient;
-
-    public OrderMapper(CartClient cartClient) {
-        this.cartClient = cartClient;
-    }
-
     public OrderResponseDto toResponse(Order order) {
         List<OrderItemResponseDto> items = order.getOrderItems().stream()
                 .map(orderItem -> OrderItemResponseDto.builder()
-                        .productName(orderItem.getName())
+                        .productName(orderItem.getProductName())
                         .productId(orderItem.getProductId())
                         .priceAtPurchase(orderItem.getPriceAtPurchase())
                         .quantity(orderItem.getQuantity())

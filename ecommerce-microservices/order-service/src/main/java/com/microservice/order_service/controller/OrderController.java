@@ -4,6 +4,7 @@ import com.microservice.order_service.domain.dto.CheckoutRequest;
 import com.microservice.order_service.domain.dto.OrderItemResponseDto;
 import com.microservice.order_service.domain.dto.OrderResponseDto;
 import com.microservice.order_service.domain.entity.Order;
+import com.microservice.order_service.mapper.OrderMapper;
 import com.microservice.order_service.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderMapper orderMapper;
 
     @PostMapping(path = "/checkout")
     public ResponseEntity<OrderResponseDto> checkout(
@@ -25,6 +27,8 @@ public class OrderController {
             @RequestBody @Valid CheckoutRequest request
     ) {
         Order order = orderService.checkout(userId, request);
-        OrderResponseDto items =
+        OrderResponseDto items = orderMapper.toResponse(order);
+
+        return ResponseEntity.ok(items);
     }
 }

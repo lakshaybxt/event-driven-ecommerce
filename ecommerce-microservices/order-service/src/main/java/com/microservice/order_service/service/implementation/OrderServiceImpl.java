@@ -29,7 +29,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepo;
     private final CartClient cartClient;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ProductClient prodClient;
 
     @Override
@@ -51,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = userCart.getItems().stream()
                 .map(cartItem -> OrderItem.builder()
                         .productId(cartItem.getProductId())
+                        .productName(cartItem.getProductName())
                         .orderStatus(OrderStatus.PENDING)
                         .priceAtPurchase(cartItem.getDiscountedPrice())
                         .quantity(cartItem.getQuantity())
@@ -79,15 +79,6 @@ public class OrderServiceImpl implements OrderService {
         order.getOrderItems().forEach(orderItem -> orderItem.setOrder(order));
 
         Order savedOrder = orderRepo.save(order);
-
-//        savedOrder.getOrderItems().forEach(orderItem -> {
-//            StockUpdateEvent event = StockUpdateEvent.builder()
-//                    .orderId(savedOrder.getId())
-//                    .productId(orderItem.getProductId())
-//                    .quantity(orderItem.getQuantity())
-//                    .build();
-//            kafkaTemplate.send(KafkaTopics.PRODUCT_STOCK_TOPIC, event);
-//        });
 
         // TODO: Empty cart and send confirmation mail
 
