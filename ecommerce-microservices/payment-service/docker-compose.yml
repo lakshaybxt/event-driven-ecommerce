@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5436:5432"
+    restart: always
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: paymentdb
+      POSTGRES_PASSWORD: changemeinprod!
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8003:8080"
