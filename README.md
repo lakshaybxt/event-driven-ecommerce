@@ -10,6 +10,7 @@ ecommerce-microservices/
   order-service/      # Handles order management
   product-service/    # Manages product catalog
   user-service/       # Manages user accounts
+  payment-service/    # Manages payments of orders 
 frontend-ecom/        # Frontend for the ecommerce platform
 ```
 
