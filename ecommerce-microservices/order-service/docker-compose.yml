@@ -2,14 +2,14 @@ services:
   db:
     image: postgres:latest
     ports:
-      - "5435:5432"
-    restart: always
+      - "${POSTGRES_PORT_ORDER:-5435}:5432"
+    restart: ${POSTGRES_RESTART:-always}
     environment:
-      POSTGRES_DB: orderdb
-      POSTGRES_USER: orderdb
-      POSTGRES_PASSWORD: changemeinprod!
+      POSTGRES_DB: ${POSTGRES_DB_ORDER:-orderdb}
+      POSTGRES_USER: ${POSTGRES_USER_ORDER:-orderdb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_ORDER}
 
   adminer:
     image: adminer:latest
     ports:
-      - "8002:8080"
+      - "${ADMINER_PORT:-8002}:8080"

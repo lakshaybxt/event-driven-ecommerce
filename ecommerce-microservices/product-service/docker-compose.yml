@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:latest
     ports:
-      - "5432:5432"
-    restart: always
+      - "${POSTGRES_PORT_PRODUCT:-5432}:5432"
+    restart: ${POSTGRES_RESTART:-always}
     environment:
-      POSTGRES_DB: productdb
-      POSTGRES_USER: productdb
-      POSTGRES_PASSWORD: changemeinprod!
+      POSTGRES_DB: ${POSTGRES_DB_PRODUCT:-productdb}
+      POSTGRES_USER: ${POSTGRES_USER_PRODUCT:-productdb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PRODUCT}
 
   adminer:
     image: adminer:latest
-    restart: always
+    restart: ${ADMINER_RESTART:-always}
     ports:
-      - "8001:8080"
+      - "${ADMINER_PORT:-8001}:8080"
