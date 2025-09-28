@@ -3,6 +3,7 @@ package com.microservice.payment_service.controller;
 import com.microservice.payment_service.domain.dto.PayRequestDto;
 import com.microservice.payment_service.domain.dto.RazorpayOrderResponse;
 import com.microservice.payment_service.domain.dto.VerifyPaymentRequest;
+import com.microservice.payment_service.kafka.event.OrderEvent;
 import com.microservice.payment_service.service.RazorpayService;
 import com.razorpay.RazorpayException;
 import jakarta.validation.Valid;
@@ -21,7 +22,7 @@ public class PaymentController {
 
     @PostMapping(path = "/create-order")
     public ResponseEntity<?> createOrder(
-            @Valid @RequestBody PayRequestDto payRequest,
+            @Valid @RequestBody OrderEvent payRequest,
             @RequestAttribute UUID userId
     ) {
         try {

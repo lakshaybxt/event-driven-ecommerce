@@ -4,6 +4,7 @@ import com.microservice.payment_service.domain.dto.PayRequestDto;
 import com.microservice.payment_service.domain.dto.RazorpayOrderResponse;
 import com.microservice.payment_service.domain.dto.VerifyPaymentRequest;
 import com.microservice.payment_service.domain.entity.Payment;
+import com.microservice.payment_service.kafka.event.OrderEvent;
 import com.microservice.payment_service.repository.PaymentRepository;
 import com.microservice.payment_service.service.RazorpayService;
 import com.razorpay.Order;
@@ -39,7 +40,7 @@ public class RazorpayServiceImpl implements RazorpayService {
     }
 
     @Override
-    public RazorpayOrderResponse createRazorPayOrder(PayRequestDto payRequest, UUID userId) throws RazorpayException {
+    public RazorpayOrderResponse createRazorPayOrder(OrderEvent payRequest, UUID userId) throws RazorpayException {
         JSONObject request = new JSONObject();
         request.put("amount", payRequest.getAmount().multiply(BigDecimal.valueOf(100)));
         request.put("currency", payRequest.getCurrency());
@@ -47,14 +48,18 @@ public class RazorpayServiceImpl implements RazorpayService {
 
         Order order = client.orders.create(request);
 
+        if (!payRequest.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized payment request");
+        }
+
         Payment payment = Payment.builder()
                 .userId(userId)
+                .orderId(payRequest.getOrderId())
                 .price(payRequest.getAmount())
                 .currency(payRequest.getCurrency())
                 .razorpayOrderId(request.get("receipt").toString())
                 .status("CREATED")
                 .build();
-
         paymentRepository.save(payment);
 
         return RazorpayOrderResponse.builder()

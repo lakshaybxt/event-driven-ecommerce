@@ -1,8 +1,10 @@
 package com.microservice.order_service.controller;
 
 import com.microservice.order_service.domain.dto.ErrorDto;
+import com.microservice.order_service.exception.AccessDeniedException;
 import com.microservice.order_service.exception.BaseException;
 import com.microservice.order_service.exception.EmptyCartException;
+import com.microservice.order_service.exception.OrderCancellationNotAllowedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,5 +72,29 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.NO_CONTENT);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorDto> handleEmptyCartException(AccessDeniedException ex) {
+        log.error("Caught AccessDeniedException: {}", ex.getMessage());
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(OrderCancellationNotAllowedException.class)
+    public ResponseEntity<ErrorDto> handleEmptyCartException(OrderCancellationNotAllowedException ex) {
+        log.error("Caught OrderCancellationNotAllowedException: {}", ex.getMessage());
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.NOT_ACCEPTABLE.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_ACCEPTABLE);
     }
 }

@@ -84,6 +84,12 @@ GitHub Actions is used for CI. See [.github/workflows/product-service.yml](.gith
 - Service dependencies and versions are managed in [ecommerce-microservices/pom.xml](ecommerce-microservices/pom.xml).
 - Each service has its own `pom.xml` and configuration files.
 
+## Remaining
+- Admin DashBoard(Spark)
+- Mail Service
+- Images
+- Wishlist
+
 ## Contributing
 
 Contributions are welcome!  

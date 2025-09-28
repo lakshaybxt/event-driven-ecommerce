@@ -1,4 +1,4 @@
-package com.microservice.product_service.kafaka.event;
+package com.microservice.order_service.kafka.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StockUpdateEvent {
-    private UUID productId;
-    private int quantity;
+public class StockEvent {
+    private UUID orderId;
+    private UUID userId;
 }

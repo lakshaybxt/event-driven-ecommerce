@@ -206,4 +206,18 @@ public class ProductController {
             return ResponseEntity.badRequest().body("Insufficient stock");
         }
     }
+
+    @PostMapping("/public/{productId}/unreserve")
+    ResponseEntity<String> unreserveStock(
+            @PathVariable("productId") UUID productId,
+            @RequestParam("qty") int qty
+    ) {
+        boolean unreserved = prodService.unreserveStock(productId, qty);
+        if (unreserved) {
+            return ResponseEntity.ok("Stock reserved successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Insufficient stock");
+        }
+    }
+
 }

@@ -25,6 +25,9 @@ public class Payment {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "order_id", nullable = false)
+    private UUID orderId;
+
     @Column(nullable = false)
     private BigDecimal price;
 
