@@ -1,6 +1,5 @@
 package com.microservice.order_service.mapper;
 
-import com.microservice.order_service.client.CartClient;
 import com.microservice.order_service.domain.AddressSnap;
 import com.microservice.order_service.domain.dto.AddressDto;
 import com.microservice.order_service.domain.dto.OrderItemResponseDto;

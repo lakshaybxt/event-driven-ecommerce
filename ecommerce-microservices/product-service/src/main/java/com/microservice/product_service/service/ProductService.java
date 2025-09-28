@@ -26,4 +26,5 @@ public interface ProductService {
     Product restoreProduct(UUID productId);
     List<Product> getAllProductsByIds(List<UUID> productIds);
     boolean reserveStock(UUID productId, int qty);
+    boolean unreserveStock(UUID productId, int qty);
 }

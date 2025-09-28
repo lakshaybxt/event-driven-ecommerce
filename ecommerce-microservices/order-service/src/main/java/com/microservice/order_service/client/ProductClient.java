@@ -12,4 +12,7 @@ import java.util.UUID;
 public interface ProductClient {
     @PostMapping("/public/{productId}/reserve")
     ResponseEntity<String> reserveStock(@PathVariable("productId") UUID productId, @RequestParam("qty") int qty);
+
+    @PostMapping("/public/{productId}/unreserve")
+    ResponseEntity<String> unreserveStock(@PathVariable("productId") UUID productId, @RequestParam("qty") int qty);
 }

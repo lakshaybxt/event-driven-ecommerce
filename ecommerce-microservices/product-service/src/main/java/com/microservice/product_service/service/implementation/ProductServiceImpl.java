@@ -1,5 +1,7 @@
 package com.microservice.product_service.service.implementation;
 
+import com.microservice.product_service.client.CartClient;
+import com.microservice.product_service.client.OrderClient;
 import com.microservice.product_service.domain.dto.ProductSearchCriteria;
 import com.microservice.product_service.domain.dto.request.CreateProductRequest;
 import com.microservice.product_service.domain.dto.request.UpdateProductRequest;
@@ -32,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final BrandService brandService;
     private final CategoryService categoryService;
+
+    private final OrderClient orderClient;
+    private final CartClient cartClient;
 
     @Override
     @Transactional
@@ -200,16 +205,17 @@ public class ProductServiceImpl implements ProductService {
         productRepo.save(existingProduct);
     }
 
+    @Transactional
     @Override
     public void permanentDeleteProduct(UUID productId) {
         Product existingProduct = getProductById(productId);
-/*
-        boolean hasAnyOrder = orderItemRepository.existsByProductId(productId);
+
+        boolean hasAnyOrder = orderClient.existsByProductId(productId);
 
         if(hasAnyOrder) {
             throw new BusinessRuleException("Cannot permanently delete product with order history");
         }
-*/
+
         if(existingProduct.isActive() || existingProduct.getUpdatedAt().isAfter(LocalDateTime.now().minusDays(15))) {
             throw new BusinessRuleException("Product must be inactive for at least 15 days before permanent deletion");
         }
@@ -235,14 +241,22 @@ public class ProductServiceImpl implements ProductService {
         return productRepo.findAllById(productIds);
     }
 
+    @Transactional
     @Override
     public boolean reserveStock(UUID productId, int qty) {
         int updated = productRepo.reserveStock(productId, qty);
         return updated > 0;
     }
 
+    @Transactional
+    @Override
+    public boolean unreserveStock(UUID productId, int qty) {
+        int updated = productRepo.unreserveStock(productId, qty);
+        return updated > 0;
+    }
+
     private void handleProductDeletion(Product product) {
-//        cartItemRepository.deleteProductById(product.getId());
+        cartClient.deleteCartProduct(product.getId());
 //        wishlistItemRepository.deleteProductById(product.getId());
     }
 }

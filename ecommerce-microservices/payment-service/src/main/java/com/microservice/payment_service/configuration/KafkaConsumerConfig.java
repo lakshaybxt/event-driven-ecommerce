@@ -1,6 +1,6 @@
-package com.microservice.order_service.configuration;
+package com.microservice.payment_service.configuration;
 
-import com.microservice.order_service.kafka.event.StockEvent;
+import com.microservice.payment_service.kafka.event.OrderEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -12,10 +12,10 @@ import org.springframework.kafka.core.ConsumerFactory;
 public class KafkaConsumerConfig {
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String, StockEvent> kafkaListenerContainerFactory(
-            ConsumerFactory<String, StockEvent> consumerFactory
+    ConcurrentKafkaListenerContainerFactory<String, OrderEvent> kafkaListenerContainerFactory(
+            ConsumerFactory<String, OrderEvent> consumerFactory
     ) {
-        ConcurrentKafkaListenerContainerFactory<String, StockEvent> factory =
+        ConcurrentKafkaListenerContainerFactory<String, OrderEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
 

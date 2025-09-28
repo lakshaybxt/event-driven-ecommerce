@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,4 +17,10 @@ public class PayRequestDto {
 
     @NotBlank(message = "Currency is required")
     private String currency;
+
+    @NotBlank(message = "Order is required to create payment")
+    private UUID orderId;
+
+    @NotBlank(message = "User is required")
+    private UUID userId;
 }
