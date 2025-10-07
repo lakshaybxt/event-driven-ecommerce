@@ -1,5 +1,6 @@
 package com.microservice.payment_service.kafka.consumer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.payment_service.domain.dto.RazorpayOrderResponse;
 import com.microservice.payment_service.kafka.event.OrderEvent;
 import com.microservice.payment_service.kafka.event.StockEvent;
@@ -18,10 +19,13 @@ public class PaymentConsumer {
 
     private final RazorpayService razorpayService;
     private final KafkaTemplate<String, StockEvent> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "order-events", groupId = "payment-service", containerFactory = "kafkaListenerContainerFactory")
-    public void processOrder(OrderEvent orderEvent) {
+    @KafkaListener(topics = "order-events", groupId = "payment-service")
+    public void processOrder(String message) {
+        OrderEvent orderEvent = null;
         try {
+            orderEvent = objectMapper.readValue(message, OrderEvent.class);
             RazorpayOrderResponse response = razorpayService.createRazorPayOrder(orderEvent, orderEvent.getUserId());
 
             StockEvent event = StockEvent.builder()

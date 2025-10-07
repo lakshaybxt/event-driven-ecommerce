@@ -36,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepo;
     private final CartClient cartClient;
     private final ProductClient prodClient;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, OrderEvent> orderKafkaTemplate;
 
     @Override
     public Order checkout(UUID userId, CheckoutRequest request) {
@@ -93,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
                 .currency("INR")
                 .build();
 
-        kafkaTemplate.send("order-events", event); // Payment-service
+        orderKafkaTemplate.send("order-events", event); // Payment-service
 
         // TODO: Empty cart and send confirmation mail
 

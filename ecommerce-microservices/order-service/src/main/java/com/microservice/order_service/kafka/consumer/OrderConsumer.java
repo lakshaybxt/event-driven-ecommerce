@@ -1,5 +1,7 @@
 package com.microservice.order_service.kafka.consumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.order_service.client.ProductClient;
 import com.microservice.order_service.domain.OrderStatus;
 import com.microservice.order_service.domain.entity.Order;
@@ -25,10 +27,18 @@ public class OrderConsumer {
     private final OrderRepository orderRepo;
     private final ProductClient prodClient;
 
-    private final KafkaTemplate<String, CartEvent> kafkaTemplate;
+    private final KafkaTemplate<String, CartEvent> cartKafkaTemplate;
+    private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "payment-success-events", groupId = "order-service", containerFactory = "kafkaListenerContainerFactory")
-    public void handleStockSuccess(StockEvent event) {
+    @KafkaListener(topics = "payment-success-events", groupId = "order-service")
+    public void handleStockSuccess(String message) {
+        StockEvent event = null;
+        try {
+            event = objectMapper.readValue(message, StockEvent.class);
+        } catch (JsonProcessingException e) {
+            log.error("Error processing StockEvent: {}", e.getMessage());
+            throw new RuntimeException("Error processing StockEvent", e);
+        }
         log.info("Stock reserved for Product {}", event.getOrderId());
 
         Optional<Order> orderOpt = orderRepo.findById(event.getOrderId());
@@ -42,12 +52,19 @@ public class OrderConsumer {
                 .userId(event.getUserId())
                 .build();
 
-        kafkaTemplate.send("cart-clear-events", cartEvent);
+        cartKafkaTemplate.send("cart-clear-events", cartEvent);
     }
-    // Need to change the topic to fail
+
     @Transactional
-    @KafkaListener(topics = "payment-fail-events", groupId = "order-service", containerFactory = "kafkaListenerContainerFactory")
-    public void handleStockFailure(StockEvent event) {
+    @KafkaListener(topics = "payment-fail-events", groupId = "order-service")
+    public void handleStockFailure(String message) {
+        StockEvent event = null;
+        try {
+            event = objectMapper.readValue(message, StockEvent.class);
+        } catch (JsonProcessingException e) {
+            log.error("Error processing StockEvent: {}", e.getMessage());
+            throw new RuntimeException("Error processing StockEvent", e);
+        }
         log.info("Stock failure for Product {}", event.getOrderId());
 
         Order order = orderRepo.findById(event.getOrderId())
@@ -58,7 +75,7 @@ public class OrderConsumer {
         orderRepo.save(order);
         log.info("Order {} cancelled ", order.getId());
 
-        // Unreserve all products, throwing exception if any fail
+        // Unreserved all products, throwing exception if any fail
         order.getOrderItems().forEach(item -> {
             ResponseEntity<String> response = prodClient.unreserveStock(item.getProductId(), item.getQuantity());
             if (!response.getStatusCode().is2xxSuccessful()) {
