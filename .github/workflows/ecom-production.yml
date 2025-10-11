@@ -28,7 +28,7 @@ jobs:
         run: |
           cd ecommerce-microservices/${{ matrix.service }}
           if [ -f docker-compose.yml ]; then
-          docker-compose up -d
+          docker compose up -d
           sleep 10
           else
           echo "No docker-compose.yml found, skipping DB."
