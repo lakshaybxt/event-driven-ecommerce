@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 
 import java.util.UUID;
 
-@FeignClient(name = "cart-service", url = "http://localhost:8083/api/v1")
+@FeignClient(name = "order-service", url = "http://localhost:8083/api/v1")
 public interface OrderClient {
 
     @GetMapping("/cart/public")
