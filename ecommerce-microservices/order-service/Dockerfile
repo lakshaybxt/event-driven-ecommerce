@@ -1,0 +1,23 @@
+# Build Stage
+FROM maven:3.9.11-eclipse-temurin-21 AS build
+WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run Stage
+FROM amazoncorretto:21
+ARG PROFILE=dev
+ARG APP_VERSION=1.0.0
+
+WORKDIR /app
+COPY --from=build /build/target/order-service-*.jar app.jar
+
+EXPOSE 8080
+
+ENV DB_URL=jdbc:postgresql://postgres-user:5432/orderdb
+ENV ACTIVE_PROFILE=${PROFILE}
+ENV JAR_VERSION=${APP_VERSION}
+
+CMD ["sh", "-c", "java -jar -Dspring.profiles.active=${ACTIVE_PROFILE} -Dspring.datasource.url=${DB_URL} app.jar"]
