@@ -22,7 +22,7 @@ jobs:
       - name: Build Project - ${{ matrix.service }}
         run: |
           cd ecommerce-microservices/${{ matrix.service }}
-          mvn clean package -DskipTests
+          mvn clean package -DskwipTests
 
       - name: Start DB - ${{ matrix.service }}
         run: |
@@ -34,10 +34,10 @@ jobs:
           echo "No docker-compose.yml found, skipping DB."
           fi
 
-#      - name: Run Tests - ${{ matrix.service }}
-#        run: |
-#          cd ecommerce-microservices/${{ matrix.service }}
-#          mvn test
+      - name: Run Tests - ${{ matrix.service }}
+        run: |
+          cd ecommerce-microservices/${{ matrix.service }}
+          mvn test
 
       - name: Build Docker Image - ${{ matrix.service }}
         run: |
