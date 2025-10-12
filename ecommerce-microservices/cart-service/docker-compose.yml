@@ -2,14 +2,14 @@ services:
   db:
     image: postgres:latest
     ports:
-      - "5434:5432"
-    restart: always
+      - "${POSTGRES_PORT_CART:-5434}:5432"
+    restart: ${POSTGRES_RESTART:-always}
     environment:
-      POSTGRES_DB: cartdb
-      POSTGRES_USER: cartdb
-      POSTGRES_PASSWORD: changemeinprod!
+      POSTGRES_DB: ${POSTGRES_DB_CART:-cartdb}
+      POSTGRES_USER: ${POSTGRES_USER_CART:-cartdb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_CART}
 
   adminer:
     image: adminer:latest
     ports:
-      - "8002:8080"
+      - "${POSTGRES_PASSWORD:-8002}:8080"
