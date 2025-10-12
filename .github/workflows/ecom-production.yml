@@ -22,7 +22,7 @@ jobs:
       - name: Build Project - ${{ matrix.service }}
         run: |
           cd ecommerce-microservices/${{ matrix.service }}
-          mvn clean package -DskwipTests
+          mvn clean package -DskipTests
 
       - name: Start DB - ${{ matrix.service }}
         run: |
